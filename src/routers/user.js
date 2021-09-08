@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../models/user.js";
 import auth from "../middleware/auth.js";
+import upload from "../middleware/upload.js";
 
 const router = new express.Router();
 
@@ -85,6 +86,10 @@ router.delete("/users/me", auth, async (req, res) => {
   } catch (e) {
     res.status(500).send();
   }
+});
+
+router.post("/users/me/avatar", auth, upload.single("avatar"), (req, res) => {
+  res.send();
 });
 
 export default router;
