@@ -1,12 +1,21 @@
 import request from "supertest";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 import app from "../src/app.js";
 import User from "../src/models/user.js";
 
+const userOneId = new mongoose.Types.ObjectId();
 
 const userOne = {
+  _id: userOneId,
   name: "Ihor",
   email: "ihor@example.com",
   password: "ihor123!",
+  tokens: [
+    {
+      token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET),
+    },
+  ],
 };
 
 beforeEach(async () => {
@@ -44,3 +53,33 @@ test("Should non login nonexistent user", async () => {
     })
     .expect(400);
 });
+
+test('Should get profile for user', async () => {
+  await request(app)
+    .get("/users/me")
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
+})
+
+test('Should not get profile for unauthenticated user', async () => {
+  await request(app)
+    .get('/users/me')
+    .send()
+    .expect(401)
+})
+
+test('Should delete account for user', async () => {
+  await request(app)
+    .delete('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
+})
+
+test('Should not delete accont for unauthenticated user', async () => {
+  await request(app)
+    .delete('/users/me')
+    .send()
+    .expect(401)
+})
