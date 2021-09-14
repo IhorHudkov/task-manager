@@ -9,14 +9,7 @@ const sendWelcomeEmail = (email, name) => {
     text: `Hello, dear ${name}!`,
     html: "<strong>and easy to do anywhere, even with Node.js</strong>",
   };
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  sgMail.send(msg);
 };
 
 const sendCancelationEmail = (email, name) => {
@@ -27,14 +20,7 @@ const sendCancelationEmail = (email, name) => {
     text: `Hello, dear ${name}!
       We are upset that you have deleted your account. Good luck to you.`,
   };
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  sgMail.send(msg);
 };
 
 export { sendWelcomeEmail, sendCancelationEmail };
