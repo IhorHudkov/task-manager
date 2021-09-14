@@ -1,27 +1,9 @@
 import request from "supertest";
-import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
+import { userOne, userOneId, setupDatabase } from "./fixtures/db.js";
 import app from "../src/app.js";
 import User from "../src/models/user.js";
 
-const userOneId = new mongoose.Types.ObjectId();
-
-const userOne = {
-  _id: userOneId,
-  name: "Ihor",
-  email: "ihor@example.com",
-  password: "ihor123!",
-  tokens: [
-    {
-      token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET),
-    },
-  ],
-};
-
-beforeEach(async () => {
-  await User.deleteMany();
-  await new User(userOne).save();
-});
+beforeEach(setupDatabase);
 
 test("Should signup a new user", async () => {
   const response = await request(app)
@@ -120,18 +102,18 @@ test("Should update valid user fields", async () => {
     })
     .expect(200);
 
-    const user = await User.findById(userOneId);
+  const user = await User.findById(userOneId);
 
-    expect(user.name).toEqual('Sam');
-    expect(user.email).toBe('sam@example.com')
+  expect(user.name).toEqual("Sam");
+  expect(user.email).toBe("sam@example.com");
 });
 
-test('Should not update invalid user fields', async () => {
+test("Should not update invalid user fields", async () => {
   await request(app)
     .patch("/users/me")
     .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
-    .send({ 
-      location: 'Boston'
+    .send({
+      location: "Boston",
     })
-    .expect(400)
-})
+    .expect(400);
+});
